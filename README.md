@@ -1,4 +1,4 @@
-# Cloud Amber Install
+# Amber Cloud Image Bakery
 Copyright 2020 Fluid Numerics LLC
 
 This repository contains scripts for creating VM images on Microsoft Azure and Google Cloud with Packer.

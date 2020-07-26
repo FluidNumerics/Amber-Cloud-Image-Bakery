@@ -3,7 +3,8 @@
     "client_id": "",
     "client_secret": "",
     "tenant_id": "",
-    "subscription_id": ""
+    "subscription_id": "",
+    "resource_group": ""
   },
   "builders": [{
     "type": "azure-arm",
@@ -13,7 +14,7 @@
     "tenant_id": "{{user `tenant_id`}}",
     "subscription_id": "{{user `subscription_id`}}",
 
-    "managed_image_resource_group_name": "amber",
+    "managed_image_resource_group_name": "{{user `resource_group`}}",
     "managed_image_name": "amber20",
 
     "os_type": "Linux",

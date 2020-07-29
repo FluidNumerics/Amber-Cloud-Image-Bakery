@@ -47,7 +47,7 @@ cmake $AMBER_PREFIX/amber20_src \
     2>&1 | tee  cmake.log
 make install
 
-# Move amber.sh to profile.d so that user environment variables are automatically loaded on login
-cp /apps/amber20/amber.sh /etc/profile.d
-
-
+cat <<EOT >> /etc/profile.d/amber.sh
+#!/bin/bash
+. /apps/amber20/amber.sh
+EOT

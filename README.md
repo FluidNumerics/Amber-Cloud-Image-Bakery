@@ -54,3 +54,40 @@ az vm create \
 ```
 
 Once you SSH into the instance, navigate to `/apps/amber20` and run `make test.cuda_serial` to verify the installation of Amber20 on this image 
+
+## Create a VM image for Google Cloud
+These instructions will show you how to build a Google Compute Engine (GCE) image that has Amber20 and AmberTools20 installed.
+
+### Prerequisites
+Complete the steps in "Getting Started" shown above. Then, [follow these instructions to set up a service account and obtain service account credentials (JSON)](https://www.packer.io/docs/builders/googlecompute.html#running-without-a-compute-engine-service-account). You will need to provide the service account `Compute Instance Admin (v1)` and `Service Account User` IAM roles on the Google Cloud project you will build the image on. This allows the service account to create GCE instances and save disk images on Google Cloud.
+
+1. Navigate to the azure subdirectory 
+```
+cd google/
+```
+2. Run packer using the appropriate variable substitutions. The resulting image name will be called `SOURCE_IMAGE-amber20`, where `SOURCE_IMAGE` is the name of the image you used as a starting point for your build. At a minimum, you must provide the `project_id`. [Default parameters](./google/packer.json) will create an image based on CentOS-7.
+```
+packer build -force -var project_id="PROJECT ID" \
+                    -var subnet="SUBNETWORK"\
+                    -var zone="ZONE"\
+                    -var source_image="SOURCE IMAGE"\
+                    -var source_image_project_id="SOURCE IMAGE PROJECT ID"\
+                    -var amber_startup_script="STARTUP SCRIPT"\
+                    ./packer.json
+```
+The `amber_startup_script` can be one of `scripts/centos/startup-script.sh` for CentOS-7 source image operating systems or `scripts/ubuntu/startup-script.sh` for Ubuntu operating systems.
+
+This build process installs GPU Accelerated AmberTools20, Amber20, and Amber dependencies (including CUDA Toolkit). Amber is installed under /apps/amber20. Amber binaries are made available to all user's search path upon login through the addition of `amber.sh` to `/etc/profile.d`.
+
+
+
+### Easy HPC Cluster Image
+If you want to run Amber20 on an elastic, cloud-native HPC cluster, you can use[Fluid Numerics' fluid-slurm-gcp](https://console.cloud.google.com/marketplace/details/fluid-cluster-ops/fluid-slurm-gcp) CentOS-7 or Ubuntu compute images. 
+
+To create an image that you can use with the [CentOS solution](https://console.cloud.google.com/marketplace/details/fluid-cluster-ops/fluid-slurm-gcp), set `source_image="fluid-slurm-gcp-compute-centos-v2-4-0" and `source_image_project_id="fluid-cluster-ops"`.
+
+To create an image that you can use with the [Ubuntu solution](https://console.cloud.google.com/marketplace/details/fluid-cluster-ops/fluid-slurm-gcp-ubuntu), set `source_image="fluid-slurm-gcp-compute-ubuntu-v2-4-0" and `source_image_project_id="fluid-cluster-ops"`.
+
+Once the image is created, you can [modify your cluster-config](https://github.com/FluidNumerics/fluid-slurm-gcp_custom-image-bakery#substituting-custom-images-in-your-compute-partitions) so that a compute partition uses your new custom image.
+
+This image will allow you to easily use Amber20 the elastic click-to-deploy [Fluid-Slurm-GCP HPC Cluster](https://console.cloud.google.com/marketplace/details/fluid-cluster-ops/fluid-slurm-gcp) on Google Cloud.

@@ -5,33 +5,32 @@
     "zone":"us-west1-a",
     "source_image":"centos-7-v20200714",
     "source_image_project_id":"centos-cloud",
-    "amber_startup_script":"../scripts/centos/startup-script.sh"
+    "base_os":"centos"
   },
   "builders": [{
     "type": "googlecompute",
     "project_id": "{{user `project_id`}}",
     "source_image": "{{user `source_image`}}",
     "source_image_project_id": "{{user `source_image_project_id`}}",
-    "disk_size": 25,
+    "disk_size": 50,
     "zone": "{{user `zone`}}",
     "subnetwork" :"{{user `subnet`}}",
     "image_family": "{{user `source_image`}}-amber20",
     "image_name": "{{user `source_image`}}-amber20-{{timestamp}}",
     "instance_name":"amber-image-node",
+    "machine_type":"n1-standard-4",
     "tags":["cloudbuild"],
-    "ssh_username": "packer",
-    "startup_script_file": "{{user `amber_startup_script`}}"
+    "ssh_username": "packer"
   }],
   "provisioners": [
     {
       "type": "file",
-      "source": "../scripts",
+      "source": "../AmberDownloads",
       "destination": "/tmp"
     },
     {
-      "type": "file",
-      "source": "../AmberDownloads",
-      "destination": "/tmp"
+      "type": "shell",
+      "script": "../scripts/{{user `base_os`}}/startup-script.sh"
     }
   ]  
 }
